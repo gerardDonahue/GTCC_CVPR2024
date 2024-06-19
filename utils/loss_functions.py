@@ -131,7 +131,7 @@ def VAVA_loss(sequences, maxIter=20, lambda1=1.0,lambda2=0.1, gamma=.5, zeta=0.5
 
             # KL(T || P)
             KLT = T + 1e-5
-            KLP= T + 1e-5
+            KLP= P + 1e-5
             KL_T_P = torch.sum(KLT * torch.log(torch.divide(KLT, KLP)))
 
             # C(X)
