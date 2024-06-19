@@ -59,7 +59,7 @@ After your code finishes executing, there will be an output folder in your $OUTP
 
 # Citation.
 If you find this work useful in your project and you would like to cite your results, be sure to use the following citation for our paper:
-```json
+```Citing
 @InProceedings{Donahue_2024_CVPR,
     author    = {Donahue, Gerard and Elhamifar, Ehsan},
     title     = {Learning to Predict Activity Progress by Self-Supervised Video Alignment},
