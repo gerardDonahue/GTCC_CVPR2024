@@ -2,11 +2,11 @@
 Code for paper titled, "Learning to Predict Activity Progress by Self-Supervised Video Alignment" by Gerard Donahue and Ehsan Elhamifar, published at CVPR 2024.
 
 # Paper Details
-"Learning to Predict Activity Progress by Self-Supervised Video Alignment" offers a method to predict activity progress for both monotonic and in-the-wild activity-based procedural videos. The paper can be accessed (here.)[https://openaccess.thecvf.com/content/CVPR2024/html/Donahue_Learning_to_Predict_Activity_Progress_by_Self-Supervised_Video_Alignment_CVPR_2024_paper.html]
+"Learning to Predict Activity Progress by Self-Supervised Video Alignment" offers a method to predict activity progress for both monotonic and in-the-wild activity-based procedural videos. The paper can be accessed [here.](https://openaccess.thecvf.com/content/CVPR2024/html/Donahue_Learning_to_Predict_Activity_Progress_by_Self-Supervised_Video_Alignment_CVPR_2024_paper.html)
 
 The primary tool we use to predict progress is video alignment (our proposed method for video alignment is called Generalized Temporal Cycle-Consistency, or GTCC), where progress prediction comes as an extremely useful byproduct of a multi-cycleback consistent embedding space amongst same-activity videos that are alignable. This github page is to increase the accessibility of our method for research or industrial purposes. 
 
-To understand the technical mechanisms in GTCC, please read (our paper)[https://openaccess.thecvf.com/content/CVPR2024/html/Donahue_Learning_to_Predict_Activity_Progress_by_Self-Supervised_Video_Alignment_CVPR_2024_paper.html]. 
+To understand the technical mechanisms in GTCC, please read [our paper](https://openaccess.thecvf.com/content/CVPR2024/html/Donahue_Learning_to_Predict_Activity_Progress_by_Self-Supervised_Video_Alignment_CVPR_2024_paper.html). 
 
 # Environment Setup
 We use python version 3.8.10. Additionally, we use Ubuntu 18.04. Please set up a virtual environment with this python version and ideally the same linux version and run the following command:
@@ -23,7 +23,7 @@ We use 3 environment variables for you to customize your data location, output p
 Please put the above environment variable declarations in your ~/.bashrc file for easy loading of variables. 
 
 # Dataset Organization
-We understand that there are many different formats for dataset download. As such, we use a JSON file to save data filenames, as well as action sequences and temporal annotations for evaluation. We encourage you to explore the JSON file for the (egoprocel dataset)[https://sid2697.github.io/egoprocel/] that we included in ./dset_jsons. 
+We understand that there are many different formats for dataset download. As such, we use a JSON file to save data filenames, as well as action sequences and temporal annotations for evaluation. We encourage you to explore the JSON file for the [egoprocel dataset](https://sid2697.github.io/egoprocel/) that we included in ./dset_jsons. 
 
 The json is a list of dictionaries, where each dictionary is the data-specific information for a task. It contains the keys of: "handles","hdl_actions", "hdl_start_times", and "hdl_end_times".
 - "handles" is a list of the filename handles of the data files. 
