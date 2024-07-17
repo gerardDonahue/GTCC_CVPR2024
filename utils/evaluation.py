@@ -30,10 +30,10 @@ class PhaseProgression:
             embedded_dl = flatten_dataloader_and_get_dict(model, test_dataloaders[task], config_obj.SKIP_RATE, device='cpu')
             if normalize:
                 embedded_dl = svm_normalize_embedded_dl(embedded_dl=embedded_dl)
+            X = []
+            y = []
             for i, (outputs_dict, tdict) in enumerate(embedded_dl):
                 outputs = outputs_dict['outputs']
-                X = []
-                y = []
                 if contains_non_float_values(outputs):
                     continue
                 true_prog = get_trueprogress(tdict).detach().cpu().numpy()
@@ -43,7 +43,7 @@ class PhaseProgression:
                     X.append(frame)
                     y.append(true_prog[k])
             _, r2 = train_linear_regressor(X, y, normalize=normalize)
-            r2 = np.mean([max(0, train_linear_regressor(X, y)[1]) for _ in range(200) ])
+            
             if len(tasks) == 1:
                 return {'task': task, 'phase_prog': r2}
 
