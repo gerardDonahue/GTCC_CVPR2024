@@ -18,7 +18,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 
-def get_target_alignment_with_dict(l1, l2, times_dict1, times_dict2, thickness=None):
+def get_target_alignment_with_dict(l1, l2, times_dict1, times_dict2):
     Y = torch.zeros(l1, l2)
     for step1, start1, end1 in zip(times_dict1['step'], times_dict1['start_frame'], times_dict1['end_frame']):
         for step2, start2, end2 in zip(times_dict2['step'], times_dict2['start_frame'], times_dict2['end_frame']):
@@ -29,12 +29,8 @@ def get_target_alignment_with_dict(l1, l2, times_dict1, times_dict2, thickness=N
                 d2 = end2 - start2
                 # for i1, i2 in zip(torch.linspace(start1, end1, steps=max(d1, d2)), torch.linspace(start2, end2, steps=max(d1, d2))):
                 for i1, i2 in zip(range(start1, end1), torch.linspace(start2, end2, steps=d1)):
-                    i, j = (i1, round(i2.item()))
-                    if thickness is None:
-                        Y[i, j] = 1
-                    else:
-                        i, j = (round(i1.item()), round(i2.item()))
-                        Y[max(0, i-thickness):min(l1-1, i+thickness), max(0, j-thickness):min(l2-1, j+thickness)] = 1
+                    i, j = (min(l1-1, i1), min(l2-1, round(i2.item())))
+                    Y[i, j] = 1
                         
     return Y / Y.sum()
 
@@ -57,14 +53,9 @@ def compute_eae_between_dict_vids(v1, v2, t1, t2, d1=None, return_plot_info=Fals
     # get total alignable distance for EAE calculation
     y_set = sorted(list(y_set))
     if wild:
-        get_dist = lambda idx_pair: sum(
-            [
-                1 for i in range(len(y_set)-1) \
-                    if y_set[i+1] - y_set[i] == 1 and \
-                        min(idx_pair[0], idx_pair[1]) <= y_set[i] and \
-                            y_set[i+1] <= max(idx_pair[0], idx_pair[1])
-            ]
-        )
+        dist_matrix = np.zeros((v2.shape[0]))
+        dist_matrix[y_set] = 1
+        get_dist = lambda idx_pair: dist_matrix[min(idx_pair[0], idx_pair[1]):max(idx_pair[0], idx_pair[1])].sum()
         vert_add_number = sum([1 for i in range(len(y_set)-1) if y_set[i+1] - y_set[i] == 1])
     else:
         get_dist = lambda idx_pair: np.abs(idx_pair[0] - idx_pair[1])

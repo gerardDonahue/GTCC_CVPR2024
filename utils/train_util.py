@@ -2,6 +2,7 @@ import glob
 from easydict import EasyDict as edict
 import json 
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,7 +19,14 @@ def save_dict_to_json_file(dictionary, filepath):
     with open(filepath, 'w') as fp:
         json.dump(dictionary, fp, indent=4)
 
-    
+
+def get_npy_shape_from_file(file_path):
+    with open(file_path, 'rb') as f:
+        version = np.lib.format.read_magic(f)
+        shape, _, _ = np.lib.format.read_array_header_1_0(f) if version == (1, 0) else np.lib.format.read_array_header_2_0(f)
+    return shape
+
+
 def get_base_model_deets(config_obj):
     if type(config_obj) == dict:
         config_obj = edict(config_obj)

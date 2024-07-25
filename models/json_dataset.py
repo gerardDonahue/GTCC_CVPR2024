@@ -6,10 +6,11 @@ import glob
 import random
 import os
 import pandas as pd
+import time
 import json
 from utils.collate_functions import jsondataset_collate_fn
 from utils.logging import configure_logging_format
-from utils.train_util import get_data_subfolder_and_extension
+from utils.train_util import get_data_subfolder_and_extension, get_npy_shape_from_file
 
 
 logger = configure_logging_format()
@@ -79,6 +80,7 @@ class JSONDataset(Dataset):
         self.data_folder = data_folder + f'/{task}'
         self.task = task
         self.split = split
+
         N = len(task_json['handles'])
         all_embeddings_files = glob.glob(f'{data_folder}/*')
         num_vids_total = len(task_json['handles'])
@@ -100,29 +102,42 @@ class JSONDataset(Dataset):
         datas = []
         times = []
         names = []
+        self.action_set = set()
         for i, (handle, action_sequence, start_times, end_times) in enumerate(zip(
             task_json['handles'], task_json['hdl_actions'], task_json['hdl_start_times'], task_json['hdl_end_times']
         )):
+            for a in action_sequence:
+                self.action_set.add(a)
+
             if i not in active_hdl_indices:
                 continue
-            assert f'{data_folder}/{handle}.{extension}' in all_embeddings_files
+            assert f'{data_folder}/{handle}.{extension}' in all_embeddings_files, f'File {handle}.{extension} not in {data_folder} folder'
             # log the data filename
             data = f'{data_folder}/{handle}.{extension}'
-            times_dict = {'step': action_sequence, 'start_frame': start_times, 'end_frame': end_times}
-            if not lazy_loading:
-                data = np.load(data)
-                if times_dict['end_frame'][-1] == data.shape[0]:
-                    times_dict['end_frame'][-1] -=  1
-                assert times_dict['end_frame'][-1] + 1 == data.shape[0]
+            times_dict = {'step': action_sequence, 'start_frame': [int(t) for t in start_times], 'end_frame': [int(t) for t in end_times], 'name': handle}
+            N = get_npy_shape_from_file(data)[0]
             
+            if N > times_dict['end_frame'][-1] - 1:
+                times_dict['end_frame'][-1] = N-1
+            elif N < times_dict['end_frame'][-1] - 1:
+                while N < times_dict['end_frame'][-1] - 1:
+                    if N > times_dict['start_frame'][-1]+1:
+                        times_dict['end_frame'][-1] = N-1
+                        break
+                    else:
+                        times_dict['start_frame'] = times_dict['start_frame'][:-1]
+                        times_dict['end_frame'] = times_dict['end_frame'][:-1]
+
             # add the times data dict
-            datas.append(data)
+            datas.append(data if lazy_loading else np.load(data))
             times.append(times_dict)
             names.append(task + '_' + handle)
 
         # logger.info("Embeddings folder and time label folder contain same file, times are in order, moving on")
         self.times = times
         self.data_label_name = list(zip(datas, times, names))
+        if loader_type == 'test':
+            random.seed(1)
         random.shuffle(self.data_label_name)
 
     def __len__(self):
@@ -181,7 +196,7 @@ def get_test_dataloaders(tasks, data_structure, config, device):
 
 def get_train_dataloaders(tasks, data_structure, config, device):
     batch_size = config.BATCH_SIZE
-    data_subfolder_name, datafile_extension = get_data_subfolder_and_extension(architecture=config.BASEARCH.ARCHITECTURE)
+    data_subfolder_name, datafile_extension = get_data_subfolder_and_extension(architecture=config.BASEARCH.ARCHITECTURE, dataset=config.DATASET_NAME)
     data_folder = f'{config.DATAFOLDER}/{data_subfolder_name}'
     test_dataloaders = {}
     for task in tasks:
@@ -195,7 +210,7 @@ def get_train_dataloaders(tasks, data_structure, config, device):
             data_size=config.DATA_SIZE,
             lazy_loading=config.LAZY_LOAD
         )
-        logger.debug(f'{len(test_set)} vids in train set for {task}')
+        # logger.debug(f'{len(test_set)} vids in train set for {task}')
         if batch_size is None:
             batch_size = len(test_set)
         test_dataloaders[task] = DataLoader(test_set, batch_size=batch_size, collate_fn=jsondataset_collate_fn, drop_last=True, shuffle=False)

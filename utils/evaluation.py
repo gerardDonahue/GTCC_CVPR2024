@@ -214,7 +214,7 @@ class EnclosedAreaError:
                     if i == j:
                         continue
                     v2 = odict2['outputs']
-                    eae = compute_eae_between_dict_vids(v1, v2, t1, t2)
+                    eae = compute_eae_between_dict_vids(v1, v2, t1, t2, wild=config_obj.DATASET_NAME in ['egoprocel']) # here add in-the-wild datasets
                     if eae is not None:
                         eae_list.append(eae)
 
