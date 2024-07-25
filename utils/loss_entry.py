@@ -11,7 +11,6 @@ def get_loss_function(config_obj):
     GTCC_PARAMS = config_obj.GTCC_PARAMS
     LAV_PARAMS = config_obj.LAV_PARAMS
     VAVA_PARAMS = config_obj.VAVA_PARAMS
-    GEO_PARAMS = config_obj.GEO_PARAMS
     def _alignment_loss_fn(output_dict_list, epoch):
         if type(output_dict_list) != list:
             output_dict_list = [output_dict_list]

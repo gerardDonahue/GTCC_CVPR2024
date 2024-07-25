@@ -73,7 +73,7 @@ def get_generic_config(multi_task_setting=False, delta=None, n_components=None):
         CONFIG.BASEARCH.TEMPORAL_STACKING_ARCH['output_dimensions'] = int(output_dimensions)
 
     # set split based on dataset
-    if dataset in ['coin-skip5', 'egoprocel-skip15', 'cmu', 'egtea']:
+    if dataset in ['coin', 'egoprocel', 'cmu', 'egtea']:
         CONFIG.TRAIN_SPLIT = [.65, .5]
     else:
         CONFIG.TRAIN_SPLIT = [.75, .5]
