@@ -37,7 +37,6 @@ class PhaseProgression:
                 if contains_non_float_values(outputs):
                     continue
                 true_prog = get_trueprogress(tdict).detach().cpu().numpy()
-                # true_prog = np.arange(o.shape[0]) / (o.shape[0] - 1)
                 outputs = outputs.detach().cpu().numpy()
                 for k, frame in enumerate(outputs):
                     X.append(frame)
@@ -54,7 +53,7 @@ class PhaseClassification:
     def __str__(self):
         return self.name
 
-    def __call__(self, model, config_obj, epoch, test_dataloaders, testfolder, tasks, normalize=False):
+    def __call__(self, model, config_obj, epoch, test_dataloaders, testfolder, tasks, normalize=True):
         percents = [.1, .5, 1]
         df = {'task': []}
         for percent in percents:
@@ -66,8 +65,6 @@ class PhaseClassification:
             num_videos = 0
             num_data_points = 0
             embedded_dl = flatten_dataloader_and_get_dict(model, test_dataloaders[task], config_obj.SKIP_RATE, device='cpu')
-            if normalize:
-                embedded_dl = svm_normalize_embedded_dl(embedded_dl=embedded_dl)
             for i, (_, tdict) in enumerate(embedded_dl):
                 num_videos += 1
                 list(map(action_set.add, tdict['step']))
@@ -99,7 +96,6 @@ class PhaseClassification:
             if contains_non_float_values(X_set_r):
                 print("X_set_r")
                 exit(1)
-            # print(Y_set_r)
             if contains_non_float_values(Y_set_r):
                 print(Y_set_r)
                 exit(1)

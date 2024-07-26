@@ -196,7 +196,7 @@ def get_test_dataloaders(tasks, data_structure, config, device):
 
 def get_train_dataloaders(tasks, data_structure, config, device):
     batch_size = config.BATCH_SIZE
-    data_subfolder_name, datafile_extension = get_data_subfolder_and_extension(architecture=config.BASEARCH.ARCHITECTURE, dataset=config.DATASET_NAME)
+    data_subfolder_name, datafile_extension = get_data_subfolder_and_extension(architecture=config.BASEARCH.ARCHITECTURE)
     data_folder = f'{config.DATAFOLDER}/{data_subfolder_name}'
     test_dataloaders = {}
     for task in tasks:

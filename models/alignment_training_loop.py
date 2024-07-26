@@ -106,7 +106,7 @@ def alignment_training_loop(
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=.00001, norm_type=2)
             optimizer.step()
             time_lengs.append(time.time() - s)
-            print(np.mean(time_lengs) * (len(all_sub_batches) - i), end='\r')
+            # print(np.mean(time_lengs) * (len(all_sub_batches) - i), end='\r')
 
         epoch_losses_to_plot.append(running_loss / (i + 1))
         _simple_loss_plot(
